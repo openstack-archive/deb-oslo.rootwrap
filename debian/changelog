@@ -1,0 +1,5 @@
+oslo.rootwrap (1.0.0-1) unstable; urgency=low
+
+  * Initial release. (Closes: #736485)
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 30 Dec 2013 15:46:09 +0800
