@@ -3,6 +3,8 @@
 UPSTREAM_GIT = git://github.com/openstack/oslo.rootwrap.git
 -include /usr/share/openstack-pkg-tools/pkgos.make
 
+export OSLO_PACKAGE_VERSION=$(VERSION)
+
 %:
 	dh $@ --buildsystem=python_distutils --with python2
 
