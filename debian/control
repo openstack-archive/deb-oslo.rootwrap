@@ -31,7 +31,7 @@ Homepage: https://launchpad.net/oslo
 Package: python-oslo.rootwrap
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: python-six (>= 1.4.1), ${misc:Depends}, ${python:Depends}
+Depends: sudo, python-six (>= 1.4.1), ${misc:Depends}, ${python:Depends}
 Description: allows fine filtering of shell commands to run as root
  The Oslo Rootwrap allows fine filtering of shell commands to run as root from
  OpenStack services.
