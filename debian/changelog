@@ -1,3 +1,9 @@
+oslo.rootwrap (1.2.0-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 01 May 2014 16:35:22 +0800
+
 oslo.rootwrap (1.0.0-2) unstable; urgency=medium
 
   * Fixes unit tests by cherry-picking a commit upstream.
