@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright (c) 2011 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -174,7 +172,7 @@ class KillFilter(CommandFilter):
             return False
 
         # NOTE(yufang521247): /proc/PID/exe may have '\0' on the
-        # end, because python doen't stop at '\0' when read the
+        # end, because python doesn't stop at '\0' when read the
         # target path.
         command = command.partition('\0')[0]
 
@@ -210,8 +208,10 @@ class IpFilter(CommandFilter):
 
     def match(self, userargs):
         if userargs[0] == 'ip':
-            if userargs[1] == 'netns':
-                return (userargs[2] in ('list', 'add', 'delete'))
+            # Avoid the 'netns exec' command here
+            for a, b in zip(userargs[1:], userargs[2:]):
+                if a == 'netns':
+                    return (b != 'exec')
             else:
                 return True
 

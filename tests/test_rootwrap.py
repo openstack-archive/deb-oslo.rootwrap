@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 #    Copyright 2011 OpenStack Foundation
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -250,6 +248,17 @@ class RootwrapTestCase(testtools.TestCase):
     def test_IpFilter_non_netns(self):
         f = filters.IpFilter('/sbin/ip', 'root')
         self.assertTrue(f.match(['ip', 'link', 'list']))
+        self.assertTrue(f.match(['ip', '-s', 'link', 'list']))
+        self.assertTrue(f.match(['ip', '-s', '-v', 'netns', 'add']))
+        self.assertTrue(f.match(['ip', 'link', 'set', 'interface',
+                                 'netns', 'somens']))
+
+    def test_IpFilter_netns(self):
+        f = filters.IpFilter('/sbin/ip', 'root')
+        self.assertFalse(f.match(['ip', 'netns', 'exec', 'foo']))
+        self.assertFalse(f.match(['ip', 'netns', 'exec']))
+        self.assertFalse(f.match(['ip', '-s', 'netns', 'exec']))
+        self.assertFalse(f.match(['ip', '-l', '42', 'netns', 'exec']))
 
     def _test_IpFilter_netns_helper(self, action):
         f = filters.IpFilter('/sbin/ip', 'root')
@@ -346,6 +355,7 @@ class RootwrapTestCase(testtools.TestCase):
             self.assertEqual(c.exec_dirs, [])
 
         self.assertFalse(config.use_syslog)
+        self.assertFalse(config.use_syslog_rfc_format)
         self.assertEqual(config.syslog_log_facility,
                          logging.handlers.SysLogHandler.LOG_SYSLOG)
         self.assertEqual(config.syslog_log_level, logging.ERROR)
@@ -360,6 +370,12 @@ class RootwrapTestCase(testtools.TestCase):
         raw.set('DEFAULT', 'use_syslog', 'true')
         config = wrapper.RootwrapConfig(raw)
         self.assertTrue(config.use_syslog)
+
+        raw.set('DEFAULT', 'use_syslog_rfc_format', 'oui')
+        self.assertRaises(ValueError, wrapper.RootwrapConfig, raw)
+        raw.set('DEFAULT', 'use_syslog_rfc_format', 'true')
+        config = wrapper.RootwrapConfig(raw)
+        self.assertTrue(config.use_syslog_rfc_format)
 
         raw.set('DEFAULT', 'syslog_log_facility', 'moo')
         self.assertRaises(ValueError, wrapper.RootwrapConfig, raw)
