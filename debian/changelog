@@ -2,6 +2,7 @@ oslo.rootwrap (1.2.0-1) unstable; urgency=medium
 
   * New upstream release.
   * Using testr / subunit correctly.
+  * Removed Debian patch (applied upstream).
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 01 May 2014 16:35:22 +0800
 
