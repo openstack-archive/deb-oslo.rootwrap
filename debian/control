@@ -9,7 +9,10 @@ Build-Depends: debhelper (>= 9),
                openstack-pkg-tools,
                python-all (>= 2.6.6-3~),
                python-pbr (>= 0.5.21),
-               python-setuptools
+               python-setuptools,
+               python3-all (>= 3.2),
+               python3-pbr,
+               python3-setuptools
 Build-depends-Indep: python-coverage (>= 3.6),
                      python-extras,
                      python-fixtures (>= 0.3.14),
@@ -21,8 +24,25 @@ Build-depends-Indep: python-coverage (>= 3.6),
                      python-subunit,
                      python-testscenarios (>= 0.4),
                      python-testtools (>= 0.9.32),
+                     python3-extras,
+                     python3-fixtures (>= 0.3.14),
+                     python3-mccabe,
+                     python3-mimeparse,
+                     python3-mock (>= 1.0),
+                     python3-six (>= 1.4.1),
+                     python3-subunit,
+                     python3-testscenarios (>= 0.4),
+                     python3-testtools (>= 0.9.32),
                      subunit,
                      testrepository (>= 0.0.17)
+Build-Conflicts: python-oslo.config,
+                 python-oslo.db,
+                 python-oslo.i18n,
+                 python-oslo.messaging,
+                 python-oslo.rootwrap,
+                 python-oslo.vmware,
+                 python3-oslo.config,
+                 python3-oslo.i18n
 Standards-Version: 3.9.5
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/oslo.rootwrap.git
 Vcs-Git: git://anonscm.debian.org/openstack/oslo.rootwrap.git
@@ -31,10 +51,25 @@ Homepage: https://launchpad.net/oslo
 Package: python-oslo.rootwrap
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: sudo, python-six (>= 1.4.1), ${misc:Depends}, ${python:Depends}
-Description: allows fine filtering of shell commands to run as root
+Depends: python-six (>= 1.4.1), sudo, ${misc:Depends}, ${python:Depends}
+Description: allows fine filtering of shell commands to run as root - Python 2.x
  The Oslo Rootwrap allows fine filtering of shell commands to run as root from
  OpenStack services.
  .
  Unlike other Oslo deliverables, it should not be used as a Python library, but
  called as a separate process through the oslo-rootwrap command.
+ .
+ This package provides the Python 2.x module.
+
+Package: python3-oslo.rootwrap
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Depends: python3-six (>= 1.4.1), sudo, ${misc:Depends}, ${python3:Depends}
+Description: allows fine filtering of shell commands to run as root - Python 3.x
+ The Oslo Rootwrap allows fine filtering of shell commands to run as root from
+ OpenStack services.
+ .
+ Unlike other Oslo deliverables, it should not be used as a Python library, but
+ called as a separate process through the oslo-rootwrap command.
+ .
+ This package provides the Python 3.x module.

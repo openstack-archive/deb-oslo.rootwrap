@@ -1,6 +1,10 @@
 oslo.rootwrap (1.2.0-2) unstable; urgency=medium
 
   * Fixed wrong VCS URLs.
+  * Added Python 3 support.
+  * Runs unit tests on build, build-conflicts with other python-osolo.*
+    packages which are on the same namespace, and then preventing from doing
+    "import oslo.rootwrap" from the current dir.
 
  -- Thomas Goirand <zigo@debian.org>  Sun, 03 Aug 2014 14:45:45 +0000
 
