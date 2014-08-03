@@ -1,3 +1,9 @@
+oslo.rootwrap (1.2.0-2) unstable; urgency=medium
+
+  * Fixed wrong VCS URLs.
+
+ -- Thomas Goirand <zigo@debian.org>  Sun, 03 Aug 2014 14:45:45 +0000
+
 oslo.rootwrap (1.2.0-1) unstable; urgency=medium
 
   * New upstream release.

@@ -24,8 +24,8 @@ Build-depends-Indep: python-coverage (>= 3.6),
                      subunit,
                      testrepository (>= 0.0.17)
 Standards-Version: 3.9.5
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/python-oslo.rootwrap.git
-Vcs-Git: git://anonscm.debian.org/openstack/python-oslo.rootwrap.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/oslo.rootwrap.git
+Vcs-Git: git://anonscm.debian.org/openstack/oslo.rootwrap.git
 Homepage: https://launchpad.net/oslo
 
 Package: python-oslo.rootwrap
