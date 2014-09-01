@@ -1,3 +1,12 @@
+oslo.rootwrap (1.2.0-3) unstable; urgency=medium
+
+  * Build depends on iproute2, because the unit test is doing some tests using
+    /sbin/ip. Thanks to Lucas Nussbaum for the bug report (Closes: #759977).
+  * Added extend-diff-ignore = "^[^/]*[.]egg-info/" to d/source/options, to be
+    able to build twice.
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 01 Sep 2014 04:06:21 +0000
+
 oslo.rootwrap (1.2.0-2) unstable; urgency=medium
 
   * Fixed wrong VCS URLs.
