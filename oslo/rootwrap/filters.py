@@ -27,8 +27,9 @@ class CommandFilter(object):
         self.args = args
         self.real_exec = None
 
-    def get_exec(self, exec_dirs=[]):
+    def get_exec(self, exec_dirs=None):
         """Returns existing executable, or empty string if none found."""
+        exec_dirs = exec_dirs or []
         if self.real_exec is not None:
             return self.real_exec
         self.real_exec = ""
@@ -47,17 +48,18 @@ class CommandFilter(object):
         """Only check that the first argument (command) matches exec_path."""
         return userargs and os.path.basename(self.exec_path) == userargs[0]
 
-    def get_command(self, userargs, exec_dirs=[]):
+    def get_command(self, userargs, exec_dirs=None):
         """Returns command to execute (with sudo -u if run_as != root)."""
+        exec_dirs = exec_dirs or []
         to_exec = self.get_exec(exec_dirs=exec_dirs) or self.exec_path
         if (self.run_as != 'root'):
             # Used to run commands at lesser privileges
             return ['sudo', '-u', self.run_as, to_exec] + userargs[1:]
         return [to_exec] + userargs[1:]
 
-    def get_environment(self, userargs):
+    def get_environment(self, userargs, env=None):
         """Returns specific environment to set, None if none."""
-        return None
+        return env
 
 
 class RegExpFilter(CommandFilter):
@@ -72,16 +74,13 @@ class RegExpFilter(CommandFilter):
         for (pattern, arg) in zip(self.args, userargs):
             try:
                 if not re.match(pattern + '$', arg):
-                    break
+                    # DENY: Some arguments did not match
+                    return False
             except re.error:
                 # DENY: Badly-formed filter
                 return False
-        else:
-            # ALLOW: All arguments matched
-            return True
-
-        # DENY: Some arguments did not match
-        return False
+        # ALLOW: All arguments matched
+        return True
 
 
 class PathFilter(CommandFilter):
@@ -102,7 +101,7 @@ class PathFilter(CommandFilter):
         if not userargs or len(userargs) < 2:
             return False
 
-        command, arguments = userargs[0], userargs[1:]
+        arguments = userargs[1:]
 
         equal_args_num = len(self.args) == len(arguments)
         exec_is_valid = super(PathFilter, self).match(userargs)
@@ -122,7 +121,8 @@ class PathFilter(CommandFilter):
                 args_equal_or_pass and
                 paths_are_within_base_dirs)
 
-    def get_command(self, userargs, exec_dirs=[]):
+    def get_command(self, userargs, exec_dirs=None):
+        exec_dirs = exec_dirs or []
         command, arguments = userargs[0], userargs[1:]
 
         # convert path values to canonical ones; copy other args as is
@@ -277,8 +277,10 @@ class EnvFilter(CommandFilter):
         to_exec = self.get_exec(exec_dirs=exec_dirs) or self.exec_path
         return [to_exec] + self.exec_args(userargs)[1:]
 
-    def get_environment(self, userargs):
-        env = os.environ.copy()
+    def get_environment(self, userargs, env=None):
+        if env is None:
+            env = os.environ
+        env = env.copy()
 
         # ignore leading 'env'
         if userargs[0] == 'env':
@@ -313,6 +315,36 @@ class IpNetnsExecFilter(ChainingFilter):
 
     def exec_args(self, userargs):
         args = userargs[4:]
+        if args:
+            args[0] = os.path.basename(args[0])
+        return args
+
+
+class ChainingRegExpFilter(ChainingFilter):
+    """Command filter doing regexp matching for prefix commands.
+
+    Remaining arguments are filtered again. This means that the command
+    specified as the arguments must be also allowed to execute directly.
+    """
+
+    def match(self, userargs):
+        # Early skip if number of args is smaller than the filter
+        if (not userargs or len(self.args) > len(userargs)):
+            return False
+        # Compare each arg (anchoring pattern explicitly at end of string)
+        for (pattern, arg) in zip(self.args, userargs):
+            try:
+                if not re.match(pattern + '$', arg):
+                    # DENY: Some arguments did not match
+                    return False
+            except re.error:
+                # DENY: Badly-formed filter
+                return False
+        # ALLOW: All arguments matched
+        return True
+
+    def exec_args(self, userargs):
+        args = userargs[len(self.args):]
         if args:
             args[0] = os.path.basename(args[0])
         return args

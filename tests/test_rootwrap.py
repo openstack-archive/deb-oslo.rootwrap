@@ -16,19 +16,22 @@ import logging
 import logging.handlers
 import os
 import subprocess
-import testtools
 import uuid
 
 import fixtures
 import mock
 from six import moves
+import testtools
 
-from oslo.rootwrap import cmd
 from oslo.rootwrap import filters
 from oslo.rootwrap import wrapper
 
 
 class RootwrapTestCase(testtools.TestCase):
+    if os.path.exists('/sbin/ip'):
+        _ip = '/sbin/ip'
+    else:
+        _ip = '/bin/ip'
 
     def setUp(self):
         super(RootwrapTestCase, self).setUp()
@@ -246,7 +249,7 @@ class RootwrapTestCase(testtools.TestCase):
         self.assertTrue(f.match(usercmd))
 
     def test_IpFilter_non_netns(self):
-        f = filters.IpFilter('/sbin/ip', 'root')
+        f = filters.IpFilter(self._ip, 'root')
         self.assertTrue(f.match(['ip', 'link', 'list']))
         self.assertTrue(f.match(['ip', '-s', 'link', 'list']))
         self.assertTrue(f.match(['ip', '-s', '-v', 'netns', 'add']))
@@ -254,14 +257,14 @@ class RootwrapTestCase(testtools.TestCase):
                                  'netns', 'somens']))
 
     def test_IpFilter_netns(self):
-        f = filters.IpFilter('/sbin/ip', 'root')
+        f = filters.IpFilter(self._ip, 'root')
         self.assertFalse(f.match(['ip', 'netns', 'exec', 'foo']))
         self.assertFalse(f.match(['ip', 'netns', 'exec']))
         self.assertFalse(f.match(['ip', '-s', 'netns', 'exec']))
         self.assertFalse(f.match(['ip', '-l', '42', 'netns', 'exec']))
 
     def _test_IpFilter_netns_helper(self, action):
-        f = filters.IpFilter('/sbin/ip', 'root')
+        f = filters.IpFilter(self._ip, 'root')
         self.assertTrue(f.match(['ip', 'link', action]))
 
     def test_IpFilter_netns_add(self):
@@ -274,32 +277,32 @@ class RootwrapTestCase(testtools.TestCase):
         self._test_IpFilter_netns_helper('list')
 
     def test_IpNetnsExecFilter_match(self):
-        f = filters.IpNetnsExecFilter('/sbin/ip', 'root')
+        f = filters.IpNetnsExecFilter(self._ip, 'root')
         self.assertTrue(
             f.match(['ip', 'netns', 'exec', 'foo', 'ip', 'link', 'list']))
 
     def test_IpNetnsExecFilter_nomatch(self):
-        f = filters.IpNetnsExecFilter('/sbin/ip', 'root')
+        f = filters.IpNetnsExecFilter(self._ip, 'root')
         self.assertFalse(f.match(['ip', 'link', 'list']))
 
         # verify that at least a NS is given
         self.assertFalse(f.match(['ip', 'netns', 'exec']))
 
     def test_IpNetnsExecFilter_nomatch_nonroot(self):
-        f = filters.IpNetnsExecFilter('/sbin/ip', 'user')
+        f = filters.IpNetnsExecFilter(self._ip, 'user')
         self.assertFalse(
             f.match(['ip', 'netns', 'exec', 'foo', 'ip', 'link', 'list']))
 
     def test_match_filter_recurses_exec_command_filter_matches(self):
-        filter_list = [filters.IpNetnsExecFilter('/sbin/ip', 'root'),
-                       filters.IpFilter('/sbin/ip', 'root')]
+        filter_list = [filters.IpNetnsExecFilter(self._ip, 'root'),
+                       filters.IpFilter(self._ip, 'root')]
         args = ['ip', 'netns', 'exec', 'foo', 'ip', 'link', 'list']
 
         self.assertIsNotNone(wrapper.match_filter(filter_list, args))
 
     def test_match_filter_recurses_exec_command_matches_user(self):
-        filter_list = [filters.IpNetnsExecFilter('/sbin/ip', 'root'),
-                       filters.IpFilter('/sbin/ip', 'user')]
+        filter_list = [filters.IpNetnsExecFilter(self._ip, 'root'),
+                       filters.IpFilter(self._ip, 'user')]
         args = ['ip', 'netns', 'exec', 'foo', 'ip', 'link', 'list']
 
         # Currently ip netns exec requires root, so verify that
@@ -308,13 +311,49 @@ class RootwrapTestCase(testtools.TestCase):
                           wrapper.match_filter, filter_list, args)
 
     def test_match_filter_recurses_exec_command_filter_does_not_match(self):
-        filter_list = [filters.IpNetnsExecFilter('/sbin/ip', 'root'),
-                       filters.IpFilter('/sbin/ip', 'root')]
+        filter_list = [filters.IpNetnsExecFilter(self._ip, 'root'),
+                       filters.IpFilter(self._ip, 'root')]
         args = ['ip', 'netns', 'exec', 'foo', 'ip', 'netns', 'exec', 'bar',
                 'ip', 'link', 'list']
 
         self.assertRaises(wrapper.NoFilterMatched,
                           wrapper.match_filter, filter_list, args)
+
+    def test_ChainingRegExpFilter_match(self):
+        filter_list = [filters.ChainingRegExpFilter('nice', 'root',
+                                                    'nice', '-?\d+'),
+                       filters.CommandFilter('cat', 'root')]
+        args = ['nice', '5', 'cat', '/a']
+        dirs = ['/bin', '/usr/bin']
+
+        self.assertIsNotNone(wrapper.match_filter(filter_list, args, dirs))
+
+    def test_ChainingRegExpFilter_not_match(self):
+        filter_list = [filters.ChainingRegExpFilter('nice', 'root',
+                                                    'nice', '-?\d+'),
+                       filters.CommandFilter('cat', 'root')]
+        args_invalid = (['nice', '5', 'ls', '/a'],
+                        ['nice', '--5', 'cat', '/a'],
+                        ['nice2', '5', 'cat', '/a'],
+                        ['nice', 'cat', '/a'],
+                        ['nice', '5'])
+        dirs = ['/bin', '/usr/bin']
+
+        for args in args_invalid:
+            self.assertRaises(wrapper.NoFilterMatched,
+                              wrapper.match_filter, filter_list, args, dirs)
+
+    def test_ChainingRegExpFilter_multiple(self):
+        filter_list = [filters.ChainingRegExpFilter('ionice', 'root', 'ionice',
+                                                    '-c[0-3]'),
+                       filters.ChainingRegExpFilter('ionice', 'root', 'ionice',
+                                                    '-c[0-3]', '-n[0-7]'),
+                       filters.CommandFilter('cat', 'root')]
+        # both filters match to ['ionice', '-c2'], but only the second accepts
+        args = ['ionice', '-c2', '-n7', 'cat', '/a']
+        dirs = ['/bin', '/usr/bin']
+
+        self.assertIsNotNone(wrapper.match_filter(filter_list, args, dirs))
 
     def test_ReadFileFilter_empty_args(self):
         goodfn = '/good/file.name'
@@ -397,7 +436,7 @@ class RootwrapTestCase(testtools.TestCase):
     def test_getlogin(self):
         with mock.patch('os.getlogin') as os_getlogin:
             os_getlogin.return_value = 'foo'
-            self.assertEqual(cmd._getlogin(), 'foo')
+            self.assertEqual(wrapper._getlogin(), 'foo')
 
     def test_getlogin_bad(self):
         with mock.patch('os.getenv') as os_getenv:
@@ -405,7 +444,7 @@ class RootwrapTestCase(testtools.TestCase):
                 os_getenv.side_effect = [None, None, 'bar']
                 os_getlogin.side_effect = OSError(
                     '[Errno 22] Invalid argument')
-                self.assertEqual(cmd._getlogin(), 'bar')
+                self.assertEqual(wrapper._getlogin(), 'bar')
                 os_getlogin.assert_called_once_with()
                 self.assertEqual(os_getenv.call_count, 3)
 

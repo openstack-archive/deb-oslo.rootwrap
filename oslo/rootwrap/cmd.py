@@ -33,24 +33,17 @@
 from __future__ import print_function
 
 import logging
-import os
-import pwd
-import signal
-import subprocess
 import sys
 
 from six import moves
+
+from oslo.rootwrap import daemon as daemon_mod
+from oslo.rootwrap import wrapper
 
 RC_UNAUTHORIZED = 99
 RC_NOCOMMAND = 98
 RC_BADCONFIG = 97
 RC_NOEXECFOUND = 96
-
-
-def _subprocess_setup():
-    # Python installs a SIGPIPE handler by default. This is usually not what
-    # non-Python subprocesses expect.
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 
 def _exit_error(execname, message, errorcode, log=True):
@@ -60,31 +53,23 @@ def _exit_error(execname, message, errorcode, log=True):
     sys.exit(errorcode)
 
 
-def _getlogin():
-    try:
-        return os.getlogin()
-    except OSError:
-        return (os.getenv('USER') or
-                os.getenv('USERNAME') or
-                os.getenv('LOGNAME'))
+def daemon():
+    return main(run_daemon=True)
 
 
-def main():
+def main(run_daemon=False):
     # Split arguments, require at least a command
     execname = sys.argv.pop(0)
-    if len(sys.argv) < 2:
-        _exit_error(execname, "No command specified", RC_NOCOMMAND, log=False)
+    if run_daemon:
+        if len(sys.argv) != 1:
+            _exit_error(execname, "Extra arguments to daemon", RC_NOCOMMAND,
+                        log=False)
+    else:
+        if len(sys.argv) < 2:
+            _exit_error(execname, "No command specified", RC_NOCOMMAND,
+                        log=False)
 
     configfile = sys.argv.pop(0)
-    userargs = sys.argv[:]
-
-    # Add ../ to sys.path to allow running from branch
-    possible_topdir = os.path.normpath(os.path.join(os.path.abspath(execname),
-                                                    os.pardir, os.pardir))
-    if os.path.exists(os.path.join(possible_topdir, "oslo", "__init__.py")):
-        sys.path.insert(0, possible_topdir)
-
-    from oslo.rootwrap import wrapper
 
     # Load configuration
     try:
@@ -103,27 +88,26 @@ def main():
                              config.syslog_log_facility,
                              config.syslog_log_level)
 
-    # Execute command if it matches any of the loaded filters
     filters = wrapper.load_filters(config.filters_path)
-    try:
-        filtermatch = wrapper.match_filter(filters, userargs,
-                                           exec_dirs=config.exec_dirs)
-        if filtermatch:
-            command = filtermatch.get_command(userargs,
-                                              exec_dirs=config.exec_dirs)
-            if config.use_syslog:
-                logging.info("(%s > %s) Executing %s (filter match = %s)" % (
-                    _getlogin(), pwd.getpwuid(os.getuid())[0],
-                    command, filtermatch.name))
 
-            obj = subprocess.Popen(command,
-                                   stdin=sys.stdin,
-                                   stdout=sys.stdout,
-                                   stderr=sys.stderr,
-                                   preexec_fn=_subprocess_setup,
-                                   env=filtermatch.get_environment(userargs))
-            obj.wait()
-            sys.exit(obj.returncode)
+    if run_daemon:
+        daemon_mod.daemon_start(config, filters)
+    else:
+        run_one_command(execname, config, filters, sys.argv)
+
+
+def run_one_command(execname, config, filters, userargs):
+    # Execute command if it matches any of the loaded filters
+    try:
+        obj = wrapper.start_subprocess(
+            filters, userargs,
+            exec_dirs=config.exec_dirs,
+            log=config.use_syslog,
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr)
+        obj.wait()
+        sys.exit(obj.returncode)
 
     except wrapper.FilterMatchNotExecutable as exc:
         msg = ("Executable not found: %s (filter match = %s)"

@@ -263,9 +263,37 @@ Example: allow to run `ip netns exec <namespace> <command>` as long as
 
 ``ip: IpNetnsExecFilter, ip, root``
 
+ChainingRegExpFilter
+--------------------
+
+Filter that allows to run the prefix command, if the beginning of its arguments
+match to a list of regular expressions, and if remaining arguments are any
+otherwise-allowed command. Parameters are:
+
+1. Executable allowed
+2. User to run the command under
+3. (and following) Regular expressions to use to match first (and subsequent)
+   command arguments.
+
+This filter regards the length of the regular expressions list as the number of
+arguments to be checked, and remaining parts are checked by other filters.
+
+Example: allow to run `/usr/bin/nice`, but only with first two parameters being
+-n and integer, and followed by any allowed command by the other filters:
+
+``nice: /usr/bin/nice, root, nice, -n, -?\d+``
+
+Note: this filter can't be used to impose that the subcommand is always run
+under the prefix command. In particular, it can't enforce that a particular
+command is only run under "nice", since the subcommand can explicitly be
+called directly.
+
 
 Calling rootwrap from OpenStack services
 =============================================
+
+Standalone mode (``sudo`` way)
+--------------------------
 
 The `oslo.processutils` library ships with a convenience `execute()` function
 that can be used to call shell commands as `root`, if you call it with the
@@ -283,3 +311,35 @@ If you want to call as `root` a previously-unauthorized command, you will also
 need to modify the filters (generally shipped in the source tree under
 `etc/rootwrap.d` so that the command you want to run as `root` will actually
 be allowed by `nova-rootwrap`.
+
+Daemon mode
+-----------
+
+Since 1.3.0 version ``oslo.rootwrap`` supports "daemon mode". In this mode
+rootwrap would start, read config file and wait for commands to be run with
+root priviledges. All communications with the daemon should go through
+``Client`` class that resides in ``oslo.rootwrap.client`` module.
+
+Its constructor expects one argument - a list that can be passed to ``Popen``
+to create rootwrap daemon process. For ``root_helper`` above it will be
+``["sudo", "nova-rootwrap-daemon", "/etc/neutron/rootwrap.conf"]``,
+for example. Note that it uses a separate script that points to
+``oslo.rootwrap.cmd:daemon`` endpoint (instead of ``:main``).
+
+The class provides one method ``execute`` with following arguments:
+
+* ``userargs`` - list of command line arguments that are to be used to run the
+  command;
+* ``env`` - dict of environment variables to be set for it (by default it's an
+  empty dict, so all environment variables are stripped);
+* ``stdin`` - string to be passed to standard input of child process.
+
+The method returns 3-tuple containing:
+
+* return code of child process;
+* string containing everything captured from its stdout stream;
+* string containing everything captured from its stderr stream.
+
+The class lazily creates an instance of the daemon, connects to it and passes
+arguments. This daemon can die or be killed, ``Client`` will respawn it and/or
+reconnect to it as necessary.

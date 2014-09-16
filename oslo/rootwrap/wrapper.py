@@ -16,7 +16,9 @@
 import logging
 import logging.handlers
 import os
-import string
+import pwd
+import signal
+import subprocess
 
 from six import moves
 
@@ -117,7 +119,7 @@ def load_filters(filters_path):
             filterconfig = moves.configparser.RawConfigParser()
             filterconfig.read(os.path.join(filterdir, filterfile))
             for (name, value) in filterconfig.items("Filters"):
-                filterdefinition = [string.strip(s) for s in value.split(',')]
+                filterdefinition = [s.strip() for s in value.split(',')]
                 newfilter = build_filter(*filterdefinition)
                 if newfilter is None:
                     continue
@@ -126,7 +128,7 @@ def load_filters(filters_path):
     return filterlist
 
 
-def match_filter(filter_list, userargs, exec_dirs=[]):
+def match_filter(filter_list, userargs, exec_dirs=None):
     """Checks user command and arguments through command filters.
 
     Returns the first matching filter.
@@ -136,6 +138,7 @@ def match_filter(filter_list, userargs, exec_dirs=[]):
     best filter match.
     """
     first_not_executable_filter = None
+    exec_dirs = exec_dirs or []
 
     for f in filter_list:
         if f.match(userargs):
@@ -149,8 +152,11 @@ def match_filter(filter_list, userargs, exec_dirs=[]):
                 leaf_filters = [fltr for fltr in filter_list
                                 if non_chain_filter(fltr)]
                 args = f.exec_args(userargs)
-                if (not args or not match_filter(leaf_filters,
-                                                 args, exec_dirs=exec_dirs)):
+                if not args:
+                    continue
+                try:
+                    match_filter(leaf_filters, args, exec_dirs=exec_dirs)
+                except (NoFilterMatched, FilterMatchNotExecutable):
                     continue
 
             # Try other filters if executable is absent
@@ -167,3 +173,35 @@ def match_filter(filter_list, userargs, exec_dirs=[]):
 
     # No filter matched
     raise NoFilterMatched()
+
+
+def _subprocess_setup():
+    # Python installs a SIGPIPE handler by default. This is usually not what
+    # non-Python subprocesses expect.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+
+def _getlogin():
+    try:
+        return os.getlogin()
+    except OSError:
+        return (os.getenv('USER') or
+                os.getenv('USERNAME') or
+                os.getenv('LOGNAME'))
+
+
+def start_subprocess(filter_list, userargs, exec_dirs=[], log=False,
+                     env=None, **kwargs):
+    filtermatch = match_filter(filter_list, userargs, exec_dirs)
+
+    command = filtermatch.get_command(userargs, exec_dirs)
+    if log:
+        logging.info("(%s > %s) Executing %s (filter match = %s)" % (
+            _getlogin(), pwd.getpwuid(os.getuid())[0],
+            command, filtermatch.name))
+
+    obj = subprocess.Popen(command,
+                           preexec_fn=_subprocess_setup,
+                           env=filtermatch.get_environment(userargs, env=env),
+                           **kwargs)
+    return obj
