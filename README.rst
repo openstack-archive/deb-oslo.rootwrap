@@ -6,8 +6,8 @@ The Oslo Rootwrap allows fine filtering of shell commands to run as `root`
 from OpenStack services.
 
 Rootwrap should be used as a separate Python process calling the
-oslo.rootwrap.cmd:main function. You can set up a specific console_script
-calling into oslo.rootwrap.cmd:main, called for example `nova-rootwrap`.
+``oslo_rootwrap.cmd:main`` function. You can set up a specific console_script
+calling into ``oslo_rootwrap.cmd:main``, called for example `nova-rootwrap`.
 To keep things simple, this document will consider that your console_script
 is called `/usr/bin/nova-rootwrap`.
 
@@ -170,7 +170,7 @@ expressions to check all subsequent arguments. Parameters are:
 Example: allow to run `/usr/sbin/tunctl`, but only with three parameters with
 the first two being -b and -t:
 
-``tunctl: /usr/sbin/tunctl, root, tunctl, -b, -t, .*``
+``tunctl: RegExpFilter, /usr/sbin/tunctl, root, tunctl, -b, -t, .*``
 
 PathFilter
 ----------
@@ -281,7 +281,7 @@ arguments to be checked, and remaining parts are checked by other filters.
 Example: allow to run `/usr/bin/nice`, but only with first two parameters being
 -n and integer, and followed by any allowed command by the other filters:
 
-``nice: /usr/bin/nice, root, nice, -n, -?\d+``
+``nice: ChainingRegExpFilter, /usr/bin/nice, root, nice, -n, -?\d+``
 
 Note: this filter can't be used to impose that the subcommand is always run
 under the prefix command. In particular, it can't enforce that a particular
@@ -318,13 +318,13 @@ Daemon mode
 Since 1.3.0 version ``oslo.rootwrap`` supports "daemon mode". In this mode
 rootwrap would start, read config file and wait for commands to be run with
 root priviledges. All communications with the daemon should go through
-``Client`` class that resides in ``oslo.rootwrap.client`` module.
+``Client`` class that resides in ``oslo_rootwrap.client`` module.
 
 Its constructor expects one argument - a list that can be passed to ``Popen``
 to create rootwrap daemon process. For ``root_helper`` above it will be
 ``["sudo", "nova-rootwrap-daemon", "/etc/neutron/rootwrap.conf"]``,
 for example. Note that it uses a separate script that points to
-``oslo.rootwrap.cmd:daemon`` endpoint (instead of ``:main``).
+``oslo_rootwrap.cmd:daemon`` endpoint (instead of ``:main``).
 
 The class provides one method ``execute`` with following arguments:
 
