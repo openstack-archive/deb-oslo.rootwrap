@@ -17,7 +17,7 @@ Build-Depends: debhelper (>= 9),
                python3-setuptools
 Build-depends-Indep: iproute2,
                      python-coverage (>= 3.6),
-                     python-eventlet (>= 0.15.1),
+                     python-eventlet (>= 0.16.1),
                      python-extras,
                      python-fixtures (>= 0.3.14),
                      python-hacking (>= 0.8.0),
@@ -26,7 +26,7 @@ Build-depends-Indep: iproute2,
                      python-mock (>= 1.0),
                      python-oslosphinx (>= 2.2.0.0~a2),
                      python-oslotest (>= 1.2.0),
-                     python-six (>= 1.7.0),
+                     python-six (>= 1.9.0),
                      python-subunit (>= 0.0.18),
                      python-testscenarios (>= 0.4),
                      python-testtools (>= 0.9.32),
@@ -36,7 +36,7 @@ Build-depends-Indep: iproute2,
                      python3-mimeparse,
                      python3-mock (>= 1.0),
                      python3-oslotest (>= 1.2.0),
-                     python3-six (>= 1.7.0),
+                     python3-six (>= 1.9.0),
                      python3-subunit (>= 0.0.18),
                      python3-testscenarios (>= 0.4),
                      python3-testtools (>= 0.9.34),
@@ -58,7 +58,7 @@ Homepage: https://launchpad.net/oslo
 Package: python-oslo.rootwrap
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: python-six (>= 1.7.0), sudo, ${misc:Depends}, ${python:Depends}
+Depends: python-six (>= 1.9.0), sudo, ${misc:Depends}, ${python:Depends}
 Provides: python-oslo-rootwrap
 Description: allows fine filtering of shell commands to run as root - Python 2.x
  The Oslo Rootwrap allows fine filtering of shell commands to run as root from
@@ -72,7 +72,7 @@ Description: allows fine filtering of shell commands to run as root - Python 2.x
 Package: python3-oslo.rootwrap
 Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
-Depends: python3-six (>= 1.7.0), sudo, ${misc:Depends}, ${python3:Depends}
+Depends: python3-six (>= 1.9.0), sudo, ${misc:Depends}, ${python3:Depends}
 Provides: python3-oslo-rootwrap
 Description: allows fine filtering of shell commands to run as root - Python 3.x
  The Oslo Rootwrap allows fine filtering of shell commands to run as root from
