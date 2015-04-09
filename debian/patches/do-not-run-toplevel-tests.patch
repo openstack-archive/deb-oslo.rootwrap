@@ -1,0 +1,15 @@
+Description: Do not run toplevel tests
+ We only want to run new tests in the oslo_rootwrap without namespace, as the
+ others are failing to work with Python 3.
+Author: Thomas Goirand <zigo@debian.org>
+Forwarded: not-needed
+Last-Update: 2015-04-09
+
+--- oslo.rootwrap-1.6.0.orig/.testr.conf
++++ oslo.rootwrap-1.6.0/.testr.conf
+@@ -1,4 +1,4 @@
+ [DEFAULT]
+-test_command=OS_STDOUT_CAPTURE=1 OS_STDERR_CAPTURE=1 OS_TEST_TIMEOUT=60 ${PYTHON:-python} -m subunit.run discover -t ./ . $LISTOPT $IDOPTION
++test_command=OS_STDOUT_CAPTURE=1 OS_STDERR_CAPTURE=1 OS_TEST_TIMEOUT=60 ${PYTHON:-python} -m subunit.run discover -t ./ ./oslo_rootwrap $LISTOPT $IDOPTION
+ test_id_option=--load-list $IDFILE
+ test_list_option=--list
