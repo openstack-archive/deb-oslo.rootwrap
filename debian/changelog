@@ -1,6 +1,7 @@
-oslo.rootwrap (1.6.0-1) UNRELEASED; urgency=medium
+oslo.rootwrap (1.6.0-1) unstable; urgency=medium
 
   * New upstream release.
+  * Uploading to unstable.
 
  -- Thomas Goirand <zigo@debian.org>  Sun, 08 Feb 2015 12:03:20 +0100
 
