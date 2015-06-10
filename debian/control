@@ -44,6 +44,8 @@ Depends: python-six (>= 1.9.0),
          ${misc:Depends},
          ${python:Depends},
 Provides: python-oslo-rootwrap,
+Breaks: python-oslo-rootwrap (<< 2.0.0-1~)
+Replaces: python-oslo-rootwrap (<< 2.0.0-1~)
 Description: allows fine filtering of shell commands to run as root - Python 2.x
  The Oslo Rootwrap allows fine filtering of shell commands to run as root from
  OpenStack services.
@@ -68,3 +70,11 @@ Description: allows fine filtering of shell commands to run as root - Python 3.x
  called as a separate process through the oslo-rootwrap command.
  .
  This package provides the Python 3.x module.
+
+Package: python-oslo-rootwrap
+Section: oldlibs
+Architecture: all
+Depends: python-oslo.rootwrap,
+         ${misc:Depends},
+Description: transitional dummy package for python-oslo-rootwrap
+ This transtional package is safe to remove.
