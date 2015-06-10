@@ -1,3 +1,11 @@
+oslo.rootwrap (2.0.0-1) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * New upstream release:
+    - d/control: Align dependency version requirements with upstream. 
+
+ -- James Page <jamespage@debian.org>  Wed, 10 Jun 2015 10:58:42 +0100
+
 oslo.rootwrap (1.6.0-1) unstable; urgency=medium
 
   * New upstream release.
