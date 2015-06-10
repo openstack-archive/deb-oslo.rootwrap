@@ -1,4 +1,4 @@
-python-oslo.rootwrap (2.0.0-1) UNRELEASED; urgency=medium
+python-oslo.rootwrap (2.0.0-1) experimental; urgency=medium
 
   * Team upload.
   * New upstream release:
@@ -8,7 +8,7 @@ python-oslo.rootwrap (2.0.0-1) UNRELEASED; urgency=medium
     - d/control: Add Breaks/Replaces and transitional package for
       python-oslo-rootwrap in Ubuntu.
 
- -- James Page <jamespage@debian.org>  Wed, 10 Jun 2015 10:58:42 +0100
+ -- James Page <jamespage@debian.org>  Wed, 10 Jun 2015 11:21:07 +0100
 
 oslo.rootwrap (1.6.0-1) unstable; urgency=medium
 
