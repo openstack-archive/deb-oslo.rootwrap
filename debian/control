@@ -35,7 +35,7 @@ Build-Depends-Indep: iproute2,
 Standards-Version: 3.9.6
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/oslo.rootwrap.git
 Vcs-Git: git://anonscm.debian.org/openstack/oslo.rootwrap.git
-Homepage: https://launchpad.net/oslo
+Homepage: https://github.com/openstack/oslo.rootwrap
 
 Package: python-oslo.rootwrap
 Architecture: all

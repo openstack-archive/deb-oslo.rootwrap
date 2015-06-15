@@ -1,3 +1,4 @@
 version=3
-http://pypi.python.org/packages/source/o/oslo.rootwrap oslo.rootwrap-(.*).tar.gz
+opts="uversionmangle=s/\.(b|rc)/~$1/" \
+https://github.com/openstack/oslo.rootwrap/tags .*/(\d[\d\.]+)\.tar\.gz
 
