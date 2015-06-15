@@ -1,3 +1,10 @@
+python-oslo.rootwrap (2.0.0-2) experimental; urgency=medium
+
+  * Using update-alternatives to handle /usr/bin/oslo-rootwrap using either
+    Python 2 or 3 (Closes: #788847).
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 15 Jun 2015 14:59:45 +0000
+
 python-oslo.rootwrap (2.0.0-1) experimental; urgency=medium
 
   * Team upload.

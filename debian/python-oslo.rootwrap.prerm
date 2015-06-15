@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "remove" ] ; then
+	update-alternatives --remove oslo-rootwrap /usr/bin/python2-oslo-rootwrap
+	update-alternatives --remove oslo-rootwrap-daemon /usr/bin/python2-oslo-rootwrap-daemon
+fi
+
+#DEBHELPER#
+
+exit 0

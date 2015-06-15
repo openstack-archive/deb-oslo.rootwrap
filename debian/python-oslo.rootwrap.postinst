@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ] ; then
+	update-alternatives --install /usr/bin/oslo-rootwrap oslo-rootwrap /usr/bin/python2-oslo-rootwrap 300
+	update-alternatives --install /usr/bin/oslo-rootwrap-daemon oslo-rootwrap-daemon /usr/bin/python2-oslo-rootwrap-daemon 300
+fi
+
+#DEBHELPER#
+
+exit 0

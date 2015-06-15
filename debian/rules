@@ -4,7 +4,7 @@ PYTHONS:=$(shell pyversions -vr)
 PYTHON3S:=$(shell py3versions -vr)
 
 UPSTREAM_GIT = git://github.com/openstack/oslo.rootwrap.git
--include /usr/share/openstack-pkg-tools/pkgos.make
+include /usr/share/openstack-pkg-tools/pkgos.make
 
 export OSLO_PACKAGE_VERSION=$(VERSION)
 
@@ -21,6 +21,10 @@ override_dh_install:
 			--root $(CURDIR)/debian/python3-oslo.rootwrap; \
 	done
 	rm -f $(CURDIR)/debian/python*-oslo.rootwrap/usr/lib/python*/dist-packages/*.pth
+	mv $(CURDIR)/debian/python-oslo.rootwrap/usr/bin/oslo-rootwrap $(CURDIR)/debian/python-oslo.rootwrap/usr/bin/python2-oslo-rootwrap
+	mv $(CURDIR)/debian/python3-oslo.rootwrap/usr/bin/oslo-rootwrap $(CURDIR)/debian/python3-oslo.rootwrap/usr/bin/python3-oslo-rootwrap
+	mv $(CURDIR)/debian/python-oslo.rootwrap/usr/bin/oslo-rootwrap-daemon $(CURDIR)/debian/python-oslo.rootwrap/usr/bin/python2-oslo-rootwrap-daemon
+	mv $(CURDIR)/debian/python3-oslo.rootwrap/usr/bin/oslo-rootwrap-daemon $(CURDIR)/debian/python3-oslo.rootwrap/usr/bin/python3-oslo-rootwrap-daemon
 
 override_dh_clean:
 	dh_clean -O--buildsystem=python_distutils
