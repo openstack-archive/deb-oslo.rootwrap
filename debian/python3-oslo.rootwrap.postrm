@@ -3,8 +3,8 @@
 set -e
 
 if [ "$1" = "remove" ] || [ "$1" = "disappear" ] ; then
-	update-alternatives --remove oslo-rootwrap /usr/bin/python2-oslo-rootwrap
-	update-alternatives --remove oslo-rootwrap-daemon /usr/bin/python2-oslo-rootwrap-daemon
+	update-alternatives --remove oslo-rootwrap /usr/bin/python3-oslo-rootwrap
+	update-alternatives --remove oslo-rootwrap-daemon /usr/bin/python3-oslo-rootwrap-daemon
 fi
 
 #DEBHELPER#
