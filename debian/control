@@ -33,8 +33,8 @@ Build-Depends-Indep: iproute2,
                      subunit,
                      testrepository,
 Standards-Version: 3.9.6
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/oslo.rootwrap.git
-Vcs-Git: git://anonscm.debian.org/openstack/oslo.rootwrap.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/python-oslo.rootwrap.git
+Vcs-Git: git://anonscm.debian.org/openstack/python-oslo.rootwrap.git
 Homepage: https://github.com/openstack/oslo.rootwrap
 
 Package: python-oslo.rootwrap
@@ -77,4 +77,4 @@ Architecture: all
 Depends: python-oslo.rootwrap,
          ${misc:Depends},
 Description: transitional dummy package for python-oslo-rootwrap
- This transtional package is safe to remove.
+ This transitional package is safe to remove.
