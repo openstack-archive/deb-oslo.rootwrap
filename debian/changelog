@@ -1,9 +1,13 @@
-python-oslo.rootwrap (2.0.0-3) UNRELEASED; urgency=medium
+python-oslo.rootwrap (2.3.0-1) experimental; urgency=medium
 
+  [ James Page ]
   * Update Vcs fields for new git repository locations.
   * Fix typo in transitional package descriptions (LP: #1471561).
 
- -- James Page <james.page@ubuntu.com>  Thu, 09 Jul 2015 10:47:50 +0100
+  [ Thomas Goirand ]
+  * New upstream release.
+
+ -- Thomas Goirand <zigo@debian.org>  Sun, 27 Sep 2015 18:45:12 +0200
 
 python-oslo.rootwrap (2.0.0-2) experimental; urgency=medium
 
