@@ -6,6 +6,7 @@ python-oslo.rootwrap (2.3.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
   * New upstream release.
+  * Fixed (build-)depends for this release.
 
  -- Thomas Goirand <zigo@debian.org>  Sun, 27 Sep 2015 18:45:12 +0200
 
