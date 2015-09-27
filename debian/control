@@ -73,6 +73,7 @@ Description: allows fine filtering of shell commands to run as root - Python 3.x
 
 Package: python-oslo-rootwrap
 Section: oldlibs
+Priority: extra
 Architecture: all
 Depends: python-oslo.rootwrap,
          ${misc:Depends},
