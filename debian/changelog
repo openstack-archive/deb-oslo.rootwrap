@@ -1,3 +1,9 @@
+python-oslo.rootwrap (2.3.0-2) unstable; urgency=medium
+
+  * Uploading to unstable.
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 15 Oct 2015 20:33:43 +0000
+
 python-oslo.rootwrap (2.3.0-1) experimental; urgency=medium
 
   [ James Page ]
