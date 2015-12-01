@@ -15,7 +15,6 @@
 import logging
 import logging.handlers
 import os
-import subprocess
 import uuid
 
 import fixtures
@@ -26,6 +25,7 @@ import testtools
 from oslo_rootwrap import cmd
 from oslo_rootwrap import daemon
 from oslo_rootwrap import filters
+from oslo_rootwrap import subprocess
 from oslo_rootwrap import wrapper
 
 
@@ -259,7 +259,7 @@ class RootwrapTestCase(testtools.TestCase):
         with mock.patch('os.readlink') as readlink:
             readlink.return_value = command + ';90bfb2 (deleted)'
             m = mock.mock_open(read_data=command)
-            with mock.patch("__builtin__.open", m, create=True):
+            with mock.patch("six.moves.builtins.open", m, create=True):
                 with mock.patch('os.path.isfile') as exists:
                     def fake_exists(path):
                         return path == command

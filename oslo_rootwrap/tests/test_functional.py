@@ -19,16 +19,8 @@ import logging
 import os
 import pwd
 import signal
-import subprocess
 import sys
 import threading
-
-try:
-    import StringIO
-except ImportError:
-    StringIO = io.StringIO
-else:
-    StringIO = StringIO.StringIO
 
 try:
     import eventlet
@@ -37,10 +29,12 @@ except ImportError:
 
 import fixtures
 import mock
+import six
 import testtools
 from testtools import content
 
 from oslo_rootwrap import client
+from oslo_rootwrap import subprocess
 from oslo_rootwrap.tests import run_daemon
 from oslo_rootwrap import wrapper
 
@@ -65,17 +59,29 @@ sh: CommandFilter, /bin/sh, root
 id: CommandFilter, /usr/bin/id, nobody
 """)
 
-    def test_run_once(self):
+    def _test_run_once(self, expect_byte=True):
         code, out, err = self.execute(['echo', 'teststr'])
         self.assertEqual(0, code)
-        self.assertEqual(b'teststr\n', out)
-        self.assertEqual(b'', err)
+        if expect_byte:
+            expect_out = b'teststr\n'
+            expect_err = b''
+        else:
+            expect_out = 'teststr\n'
+            expect_err = ''
+        self.assertEqual(expect_out, out)
+        self.assertEqual(expect_err, err)
 
-    def test_run_with_stdin(self):
+    def _test_run_with_stdin(self, expect_byte=True):
         code, out, err = self.execute(['cat'], stdin=b'teststr')
         self.assertEqual(0, code)
-        self.assertEqual(b'teststr', out)
-        self.assertEqual(b'', err)
+        if expect_byte:
+            expect_out = b'teststr'
+            expect_err = b''
+        else:
+            expect_out = 'teststr'
+            expect_err = ''
+        self.assertEqual(expect_out, out)
+        self.assertEqual(expect_err, err)
 
     def test_run_as(self):
         if os.getuid() != 0:
@@ -112,6 +118,12 @@ class RootwrapTest(_FunctionalBase, testtools.TestCase):
                        content.text_content(err.decode('utf-8', 'replace')))
         return proc.returncode, out, err
 
+    def test_run_once(self):
+        self._test_run_once(expect_byte=True)
+
+    def test_run_with_stdin(self):
+        self._test_run_with_stdin(expect_byte=True)
+
 
 class RootwrapDaemonTest(_FunctionalBase, testtools.TestCase):
     def assert_unpatched(self):
@@ -127,13 +139,13 @@ class RootwrapDaemonTest(_FunctionalBase, testtools.TestCase):
 
         # Collect daemon logs
         daemon_log = io.BytesIO()
-        p = mock.patch('subprocess.Popen',
+        p = mock.patch('oslo_rootwrap.subprocess.Popen',
                        run_daemon.forwarding_popen(daemon_log))
         p.start()
         self.addCleanup(p.stop)
 
         # Collect client logs
-        client_log = StringIO()
+        client_log = six.StringIO()
         handler = logging.StreamHandler(client_log)
         log_format = run_daemon.log_format.replace('+', ' ')
         handler.setFormatter(logging.Formatter(log_format))
@@ -165,6 +177,12 @@ class RootwrapDaemonTest(_FunctionalBase, testtools.TestCase):
 
         self.execute = self.client.execute
 
+    def test_run_once(self):
+        self._test_run_once(expect_byte=False)
+
+    def test_run_with_stdin(self):
+        self._test_run_with_stdin(expect_byte=False)
+
     def test_error_propagation(self):
         self.assertRaises(wrapper.NoFilterMatched, self.execute, ['other'])
 
@@ -173,7 +191,7 @@ class RootwrapDaemonTest(_FunctionalBase, testtools.TestCase):
         self.execute(['cat'])
         # Make daemon go away
         os.kill(self.client._process.pid, signal.SIGTERM)
-        # Expect client to succesfully restart daemon and run simple request
+        # Expect client to successfully restart daemon and run simple request
         self.test_run_once()
 
     def _exec_thread(self, fifo_path):
@@ -206,8 +224,8 @@ class RootwrapDaemonTest(_FunctionalBase, testtools.TestCase):
             raise self._thread_res  # Python 3 will even provide nice traceback
         code, out, err = self._thread_res
         self.assertEqual(0, code)
-        self.assertEqual(b'OK\n', out)
-        self.assertEqual(b'', err)
+        self.assertEqual('OK\n', out)
+        self.assertEqual('', err)
 
     @contextlib.contextmanager
     def _test_daemon_cleanup(self):

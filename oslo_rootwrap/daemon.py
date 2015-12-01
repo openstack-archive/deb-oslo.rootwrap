@@ -21,13 +21,14 @@ from multiprocessing import managers
 import os
 import shutil
 import signal
+import six
 import stat
-import subprocess
 import sys
 import tempfile
 import threading
 
 from oslo_rootwrap import jsonrpc
+from oslo_rootwrap import subprocess
 from oslo_rootwrap import wrapper
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +53,12 @@ class RootwrapClass(object):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
+        if six.PY3 and stdin is not None:
+            stdin = os.fsencode(stdin)
         out, err = obj.communicate(stdin)
+        if six.PY3:
+            out = os.fsdecode(out)
+            err = os.fsdecode(err)
         return obj.returncode, out, err
 
     def shutdown(self):
