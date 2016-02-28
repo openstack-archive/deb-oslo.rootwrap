@@ -1,6 +1,10 @@
 python-oslo.rootwrap (4.0.0-1) UNRELEASED; urgency=medium
 
+  [ Corey Bryant ]
   * New upstream release.
+
+  [ Ondřej Nový ]
+  * Fixed VCS URLs (https).
 
  -- Corey Bryant <corey.bryant@canonical.com>  Tue, 23 Feb 2016 16:35:43 -0500
 
