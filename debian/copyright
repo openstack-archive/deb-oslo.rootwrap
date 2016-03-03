@@ -2,12 +2,12 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: oslo.rootwrap
 Source: git://github.com/openstack/oslo.rootwrap.git
 
-Files: debian/*
-Copyright: (c) 2013, Thomas Goirand <zigo@debian.org>
-License: Apache-2
-
 Files: *
 Copyright: (c) 2013, OpenStack foundation
+License: Apache-2
+
+Files: debian/*
+Copyright: (c) 2013-2016, Thomas Goirand <zigo@debian.org>
 License: Apache-2
 
 License: Apache-2
