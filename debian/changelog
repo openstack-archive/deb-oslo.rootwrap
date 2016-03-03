@@ -9,6 +9,7 @@ python-oslo.rootwrap (4.1.0-1) experimental; urgency=medium
   [ Thomas Goirand ]
   * New upstream release.
   * Standards-Version: 3.9.7 (no change).
+  * Fixed (build-)depends for this release.
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 03 Mar 2016 02:16:02 +0000
 
