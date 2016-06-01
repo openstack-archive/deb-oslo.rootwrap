@@ -7,6 +7,7 @@ python-oslo.rootwrap (4.2.0-1) UNRELEASED; urgency=medium
 
   [ Corey Bryant ]
   * New upstream release.
+  * d/gbp.conf: Update branch for Newton.
 
  -- Corey Bryant <corey.bryant@canonical.com>  Wed, 01 Jun 2016 10:29:21 -0400
 
