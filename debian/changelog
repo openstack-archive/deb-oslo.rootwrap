@@ -1,3 +1,9 @@
+python-oslo.rootwrap (4.3.0-1) UNRELEASED; urgency=medium
+
+  * New upstream release for OpenStack Newton.
+
+ -- David Della Vecchia <ddv@canonical.com>  Thu, 30 Jun 2016 11:23:12 -0400
+
 python-oslo.rootwrap (4.2.0-1) experimental; urgency=medium
 
   [ Ondřej Nový ]
