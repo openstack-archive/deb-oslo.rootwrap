@@ -1,9 +1,13 @@
-python-oslo.rootwrap (4.3.0-1) UNRELEASED; urgency=medium
+python-oslo.rootwrap (4.3.0-1) experimental; urgency=medium
 
+  [ David Della Vecchia ]
   * New upstream release.
   * d/control: Align (build-)depends with upstream.
 
- -- David Della Vecchia <ddv@canonical.com>  Thu, 30 Jun 2016 11:23:12 -0400
+  [ Thomas Goirand ]
+  * Drop python-oslo-rootwrap, now useless after Xenial is released.
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 01 Jul 2016 21:28:41 +0200
 
 python-oslo.rootwrap (4.2.0-1) experimental; urgency=medium
 

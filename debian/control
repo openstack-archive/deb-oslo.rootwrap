@@ -73,12 +73,3 @@ Description: allows fine filtering of shell commands to run as root - Python 3.x
  called as a separate process through the oslo-rootwrap command.
  .
  This package provides the Python 3.x module.
-
-Package: python-oslo-rootwrap
-Section: oldlibs
-Priority: extra
-Architecture: all
-Depends: python-oslo.rootwrap,
-         ${misc:Depends},
-Description: transitional dummy package for python-oslo-rootwrap
- This transitional package is safe to remove.
