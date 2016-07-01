@@ -6,6 +6,7 @@ python-oslo.rootwrap (4.3.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
   * Drop python-oslo-rootwrap, now useless after Xenial is released.
+  * Switch to pkgos-dh_auto_{install,test}.
 
  -- Thomas Goirand <zigo@debian.org>  Fri, 01 Jul 2016 21:28:41 +0200
 
