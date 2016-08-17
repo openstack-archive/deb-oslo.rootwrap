@@ -1,0 +1,8 @@
+Code-Review+2: ChangBo Guo(gcb) <glongwave@gmail.com>
+Workflow+1: Joshua Harlow <jxharlow@godaddy.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 13 Jul 2016 00:30:54 +0000
+Reviewed-on: https://review.openstack.org/340879
+Project: openstack/deb-oslo.rootwrap
+Branch: refs/heads/master
