@@ -1,4 +1,0 @@
-[Filters]
-
-ip: IpFilter, ip, root
-ip_exec: IpNetnsExecFilter, ip, root
